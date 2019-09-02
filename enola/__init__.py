@@ -2,7 +2,7 @@
 
 import click
 
-from enola import composer
+from enola.products import composer
 
 
 @click.group()

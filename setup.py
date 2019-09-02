@@ -16,7 +16,8 @@ setup(
     },
     license='WTFPL',
     packages=[
-        'enola'
+        'enola',
+        'enola.products'
     ],
     install_requires=[
         'Click==7.0'
