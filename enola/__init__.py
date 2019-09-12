@@ -2,6 +2,7 @@
 
 import click
 
+import enola
 from enola.products import composer
 
 
@@ -10,4 +11,6 @@ def external_command():
     pass
 
 
-external_command.add_command(composer.external_command, name='composer')
+from enola import products
+for module_name, module in products.EXTERNALS.items():
+    external_command.add_command(module.external_command, name=module_name)
