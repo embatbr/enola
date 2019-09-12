@@ -5,24 +5,6 @@ import click
 from enola.utils import read_product_config, run_cmd
 
 
-CMD_STRING_TEMPLATE = """gcloud beta composer environments create {name} \
-    --project {project} \
-    --node-count {node-count} \
-    --location {location} \
-    --zone {zone} \
-    --machine-type {machine-type} \
-    --disk-size {disk-size} \
-    --tags {tags} \
-    --image-version {image-version} \
-    --python-version {python-version} \
-    --network {network} \
-    --subnetwork {subnetwork} \
-    --airflow-configs {airflow-configs} \
-    --labels {labels} \
-    --async
-"""
-
-
 def _airflow_configs(configs):
     concat = list()
 
@@ -51,6 +33,23 @@ def external_command():
 @click.command()
 @click.argument('env')
 def build(env):
+    TEMPLATE = """gcloud beta composer environments create {name} \
+        --project {project} \
+        --node-count {node-count} \
+        --location {location} \
+        --zone {zone} \
+        --machine-type {machine-type} \
+        --disk-size {disk-size} \
+        --tags {tags} \
+        --image-version {image-version} \
+        --python-version {python-version} \
+        --network {network} \
+        --subnetwork {subnetwork} \
+        --airflow-configs {airflow-configs} \
+        --labels {labels} \
+        --async
+    """
+
     config = read_product_config('composer', env)
     template_args = {
         'project': config['project'],
@@ -69,7 +68,7 @@ def build(env):
         'labels': _airflow_labels(config['labels'])
     }
 
-    run_cmd(CMD_STRING_TEMPLATE, template_args)
+    run_cmd(TEMPLATE, template_args)
 
 
 external_command.add_command(build)

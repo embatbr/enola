@@ -19,6 +19,6 @@ def read_product_config(product, env):
         return json.load(f)
 
 
-def run_cmd(cmd_string_template, template_args):
-    cmd_string = cmd_string_template.format(**template_args)
+def run_cmd(template, template_args):
+    cmd_string = template.format(**template_args)
     os.system(cmd_string)
