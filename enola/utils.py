@@ -20,5 +20,6 @@ def read_product_config(product, env):
 
 
 def run_cmd(template, template_args):
-    cmd_string = template.format(**template_args)
+    template_concat = ' '.join(template)
+    cmd_string = template_concat.format(**template_args)
     os.system(cmd_string)

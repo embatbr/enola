@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import time
+
 import click
 
 from enola.utils import read_product_config, run_cmd
@@ -24,7 +26,6 @@ def _airflow_labels(labels):
     return ','.join(concat)
 
 
-
 @click.group()
 def external_command():
     pass
@@ -33,25 +34,27 @@ def external_command():
 @click.command()
 @click.argument('env')
 def build(env):
-    TEMPLATE = """gcloud beta composer environments create {name} \
-        --project {project} \
-        --node-count {node-count} \
-        --location {location} \
-        --zone {zone} \
-        --machine-type {machine-type} \
-        --disk-size {disk-size} \
-        --tags {tags} \
-        --image-version {image-version} \
-        --python-version {python-version} \
-        --network {network} \
-        --subnetwork {subnetwork} \
-        --airflow-configs {airflow-configs} \
-        --labels {labels} \
-        --async
-    """
+    _TEMPLATE = [
+        'gcloud beta composer environments create {name}',
+        '--project {project}',
+        '--node-count {node-count}',
+        '--location {location}',
+        '--zone {zone}',
+        '--machine-type {machine-type}',
+        '--disk-size {disk-size}',
+        '--tags {tags}',
+        '--image-version {image-version}',
+        '--python-version {python-version}',
+        '--network {network}',
+        '--subnetwork {subnetwork}',
+        '--airflow-configs {airflow-configs}',
+        '--labels {labels}',
+        '--async'
+    ]
 
     config = read_product_config('composer', env)
-    template_args = {
+
+    run_cmd(_TEMPLATE, {
         'project': config['project'],
         'name': config['name'],
         'node-count': config['node-config']['count'],
@@ -66,9 +69,42 @@ def build(env):
         'subnetwork': config['network-config']['subnetwork'],
         'airflow-configs': _airflow_configs(config['airflow-config-overrides']),
         'labels': _airflow_labels(config['labels'])
-    }
+    })
 
-    run_cmd(TEMPLATE, template_args)
+
+@click.command()
+@click.argument('env')
+def deploy(env):
+    _TEMPLATE_IMPORT = [
+        'gcloud composer environments storage {folder} import',
+        '--environment {name}',
+        '--location {location}',
+        '--source ./{folder}/',
+        '--project {project}'
+    ]
+
+    _TEMPLATE_RUN = [
+        'gcloud composer environments run {name}',
+        '--location {location}',
+        '--project {project}',
+        'list_dags'
+    ]
+
+    config = read_product_config('composer', env)
+
+    run_cmd(_TEMPLATE_IMPORT, {
+        'project': config['project'],
+        'name': config['name'],
+        'location': config['node-config']['location'],
+        'folder': 'dags'
+    })
+    time.sleep(5)
+    run_cmd(_TEMPLATE_RUN, {
+        'project': config['project'],
+        'name': config['name'],
+        'location': config['node-config']['location']
+    })
 
 
 external_command.add_command(build)
+external_command.add_command(deploy)
