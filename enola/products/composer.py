@@ -79,7 +79,7 @@ def deploy(env):
         'gcloud composer environments storage {folder} import',
         '--environment {name}',
         '--location {location}',
-        '--source ./{folder}/',
+        '--source ./composer/{folder}/',
         '--project {project}'
     ]
 
