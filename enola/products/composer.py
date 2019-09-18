@@ -7,6 +7,9 @@ import click
 from enola.utils import read_product_config, run_cmd
 
 
+# INTERNALS BEGIN
+
+
 def _airflow_configs(configs):
     concat = list()
 
@@ -24,6 +27,11 @@ def _airflow_labels(labels):
         concat.append('{}={}'.format(key, value))
 
     return ','.join(concat)
+
+
+# INTERNALS END
+
+# EXTERNALS BEGIN
 
 
 @click.group()
