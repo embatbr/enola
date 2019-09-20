@@ -20,7 +20,8 @@ setup(
         'enola.products'
     ],
     install_requires=[
-        'Click==7.0'
+        'Click==7.0',
+        'google-cloud-bigquery==1.20.0'
     ],
     entry_points='''
         [console_scripts]
