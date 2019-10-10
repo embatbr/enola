@@ -57,7 +57,6 @@ def build(env):
         '--subnetwork {subnetwork}',
         '--airflow-configs {airflow-configs}',
         '--labels {labels}',
-        '--service-account {service-account}',
         '--async'
     ]
 
@@ -77,8 +76,7 @@ def build(env):
         'network': config['network-config']['network'],
         'subnetwork': config['network-config']['subnetwork'],
         'airflow-configs': _airflow_configs(config['airflow-config-overrides']),
-        'labels': _airflow_labels(config['labels']),
-        'service-account': config['service-account']
+        'labels': _airflow_labels(config['labels'])
     })
 
 
