@@ -58,7 +58,7 @@ def _create_table(project, dataset_name, name, schemaspath):
     run_cmd(_TEMPLATE, template_args)
 
 
-def _create_view(views_project, views_dataset, origin_project, origin_dataset, table):
+def _create_views(views_project, views_dataset, origin_project, origin_dataset, table):
     _TEMPLATE = [
         "bq --project_id {views_project} mk",
         "--use_legacy_sql=false",
@@ -145,7 +145,7 @@ def views(views_project, views_dataset, origin_project, origin_dataset):
     filenames = os.listdir(schemaspath)
     tables = [filename[0 : -5] for filename in filenames]
     for table in tables:
-        _create_view(views_project, views_dataset, origin_project, origin_dataset, table)
+        _create_views(views_project, views_dataset, origin_project, origin_dataset, table)
 
     _share_views(views_project, views_dataset, origin_project, origin_dataset, tables)
 
