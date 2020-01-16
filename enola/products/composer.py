@@ -29,6 +29,41 @@ def _airflow_labels(labels):
     return ','.join(concat)
 
 
+def _deploy(env, artifact):
+    _TEMPLATE_IMPORT = [
+        'gcloud composer environments storage {folder} import',
+        '--environment {name}',
+        '--location {location}',
+        '--source ./composer/{folder}/{artifact}',
+        '--project {project}'
+    ]
+
+    _TEMPLATE_RUN = [
+        'gcloud composer environments run {name}',
+        '--location {location}',
+        '--project {project}',
+        'list_dags'
+    ]
+
+    config = read_product_config('composer', env)
+
+    run_cmd(_TEMPLATE_IMPORT, {
+        'project': config['project'],
+        'name': config['name'],
+        'location': config['node-config']['location'],
+        'folder': 'dags',
+        'artifact': artifact
+    })
+
+    time.sleep(5)
+
+    run_cmd(_TEMPLATE_RUN, {
+        'project': config['project'],
+        'name': config['name'],
+        'location': config['node-config']['location']
+    })
+
+
 # INTERNALS END
 
 # EXTERNALS BEGIN
@@ -82,40 +117,22 @@ def build(env):
 
 @click.command()
 @click.argument('env')
-def deploy(env):
-    _TEMPLATE_IMPORT = [
-        'gcloud composer environments storage {folder} import',
-        '--environment {name}',
-        '--location {location}',
-        '--source ./composer/{folder}/',
-        '--project {project}'
-    ]
+@click.argument('name')
+def deploy_dag(env, name):
+    filename = '{}.py'.format(name)
+    _deploy(env, filename)
 
-    _TEMPLATE_RUN = [
-        'gcloud composer environments run {name}',
-        '--location {location}',
-        '--project {project}',
-        'list_dags'
-    ]
 
-    config = read_product_config('composer', env)
-
-    run_cmd(_TEMPLATE_IMPORT, {
-        'project': config['project'],
-        'name': config['name'],
-        'location': config['node-config']['location'],
-        'folder': 'dags'
-    })
-    time.sleep(5)
-    run_cmd(_TEMPLATE_RUN, {
-        'project': config['project'],
-        'name': config['name'],
-        'location': config['node-config']['location']
-    })
+@click.command()
+@click.argument('env')
+@click.argument('name')
+def deploy_lib(env, name):
+    _deploy(env, name)
 
 
 external_command.add_command(build)
-external_command.add_command(deploy)
+external_command.add_command(deploy_dag, 'deploy-dag')
+external_command.add_command(deploy_lib, 'deploy-lib')
 
 
 # EXTERNALS END
