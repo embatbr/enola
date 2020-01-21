@@ -117,10 +117,19 @@ def build(env):
 
 @click.command()
 @click.argument('env')
-@click.argument('name')
-def deploy_dag(env, name):
-    filename = '{}.py'.format(name)
+@click.argument('dagname')
+def deploy_dag(env, dagname):
+    filename = '{}.py'.format(dagname)
     _deploy(env, filename)
+
+
+@click.command()
+@click.argument('env')
+@click.argument('dagnames', nargs=-1)
+def deploy_dags(env, dagnames):
+    for name in dagnames:
+        filename = '{}.py'.format(name)
+        _deploy(env, filename)
 
 
 @click.command()
@@ -132,6 +141,7 @@ def deploy_lib(env, name):
 
 external_command.add_command(build)
 external_command.add_command(deploy_dag, 'deploy-dag')
+external_command.add_command(deploy_dags, 'deploy-dags')
 external_command.add_command(deploy_lib, 'deploy-lib')
 
 
